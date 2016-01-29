@@ -8,6 +8,21 @@
         var hasOwn = window.Utils.hasOwnProp;
 
         /**
+         * @param fn
+         * @param context
+         * @returns {Function}
+         */
+        function callOnce(fn, context){
+            var called = false, value;
+            return function(){
+                if(!called){
+                    called = true;
+                    value = fn.apply(context ? context : this, arguments);
+                }
+                return value;
+            }
+        }
+        /**
          * @namespace Support
          */
         /**
@@ -18,11 +33,8 @@
          * @returns {boolean}
          */
         function Support(need) {
-            if (hasOwn(Support.$$support$$, need)) {
-                return Support.$$support$$[need];
-            }
             if (hasOwn(Support, need)) {
-                return Support.$$support$$[need] = Support[need]();
+                return Support[need]();
             }
             return false;
         }
@@ -30,17 +42,9 @@
         /**
          * @memberOf Support
          * @static
-         * 
-         * @type {Object.<string, boolean>}
-         */
-        Support.$$support$$ = {};
-
-        /**
-         * @memberOf Support
-         * @static
          * @returns {boolean}
          */
-        Support.Css3d = function () {
+        Support.Css3d = callOnce(function () {
             if (!window.getComputedStyle) {
                 return false;
             }
@@ -62,7 +66,7 @@
             }
             body.removeChild(el);
             return (has3d !== undefined && has3d.length > 0 && has3d !== "none");
-        };
+        });
 
         /**
          * @memberOf Support
@@ -70,9 +74,9 @@
          * 
          * @returns {boolean}
          */
-        Support.isMobileDevice = function isMobileDevice() {
+        Support.isMobileDevice = callOnce(function isMobileDevice() {
             return /mobile|tablet|ip(ad|hone|od)|android/i.test(navigator.userAgent);
-        };
+        });
 
         return Support;
     }

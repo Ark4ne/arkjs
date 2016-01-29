@@ -203,7 +203,7 @@
         if(hasOwn(Ark.$$modules$$, moduleName)){
             return Ark.$$modules$$[moduleName].getInstance();
         }
-        if(global[moduleName] !== null){
+        if(global[moduleName] !== undefined){
             return global[moduleName];
         }
         throw new Error("Module '"+moduleName+"' not defined.")

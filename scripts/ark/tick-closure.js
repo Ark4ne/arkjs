@@ -39,13 +39,13 @@
         
         return TickAnimationFrame;
     });
-    
+
     Ark.define('TickTimeout', function factory() {
         /**
          * @param {Function} fn
          * @param {number} time
          * @param {Object} [context]
-         * 
+         *
          * @return {Function}
          */
         function TickTimeout(fn, time, context){
