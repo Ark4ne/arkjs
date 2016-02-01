@@ -1,5 +1,6 @@
 
 $GIT_DIR/_version
+$GIT_DIR/packages
 $GIT_DIR/styles
 
 $GIT_DIR/scripts/modules

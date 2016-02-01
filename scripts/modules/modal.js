@@ -132,11 +132,12 @@
             return div;
         };
         /**
+         * @constructor
+         * @extends {Modal}
+         *
          * @param body
          * @param header
          * @param btnFooter
-         * @constructor
-         * @extends {Modal}
          */
         function ModalContent(body, header, btnFooter) {
             ModalContent.__super__.constructor.apply(this, arguments);

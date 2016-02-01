@@ -42,7 +42,7 @@
              * @param {Object} [data]
              */
             emit : function(event, data){
-                var handler = this.handlers[event], i = 0, len = handler.length;
+                var handler = this.handlers[event], i = 0, len = handler ? handler.length : 0;
 
                 while(i < len){
                     handler[i++](data);

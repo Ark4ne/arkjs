@@ -110,7 +110,7 @@
                     }
 
                     this.eventie.emit('progress', {
-                        prog : this.prog, imgs : this.imgs
+                        img : img, prog : this.prog, total : this.imgs
                     });
 
                     if (this.prog === this.imgs) {
