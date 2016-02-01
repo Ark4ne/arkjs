@@ -20,7 +20,7 @@
             this.isEnable = false;
             this.settings = Utils.merge({
                 direction : InfiniteScroll.DIRECTION_HORIZONTAL,
-                distance : 1000
+                distance : winSize().height * 2
             }, settings);
             this.enable();
         }
