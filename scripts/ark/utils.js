@@ -109,6 +109,11 @@ function UtilsGlobalClosure(window, document, Math, undefined) {
     }
 
     /**
+     * DON'T USE THIS
+     * -> Use Function.prototype.bind
+     * 
+     * @deprecated
+     * 
      * @param {Function} fn - A Function
      * @param {*} context - A context
      *
@@ -121,6 +126,7 @@ function UtilsGlobalClosure(window, document, Math, undefined) {
      * @returns {Function}
      */
     function bindArgs(fn, context) {
+        console.log('deprecated:bindArgs')
         var _i = 2, _len = arguments.length, args;
         if (_len > 2) {
             args = new Array(_len - 2);
@@ -139,22 +145,27 @@ function UtilsGlobalClosure(window, document, Math, undefined) {
     }
 
     /**
-     * @TODO Rewrite as Class
-     * 
      * @param {Function} fn
      * @param {*} [context]
      *
      * @returns {Function}
      */
     function callOnce(fn, context){
-        var called = false, value;
-        return function(){
-            if(!called){
-                called = true;
-                value = fn.apply(context ? context : this, arguments);
+        return (
+            /**
+             * @param {boolean} called
+             * @param {*} [value]
+             */
+            function callOnceClosure(called, value){
+                return function(){
+                    if(!called){
+                        called = true;
+                        value = fn.apply(context ? context : this, arguments);
+                    }
+                    return value;
+                }
             }
-            return value;
-        }
+        )(false);
     }
 
     /**
