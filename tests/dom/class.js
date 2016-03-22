@@ -5,17 +5,19 @@
         var dom = Ark('Dom');
         var body = dom.getBody();
         var defClazzName = body.className.length ? body.className + ' ' : '';
-        var supportClassList = dom.supportClassList
+        var supportClassList = dom.supportClassList;
         for(var i =0, len=DATAS.length; i < len; i++){
             var clazz = DATAS[i].clazz;
 
             dom.addClass(body, clazz);
-            assert.strictEqual(supportClassList ? body.className.split(',').join(' ') : body.className, defClazzName + clazz, 'Dom:addClass');
+            dom.addClass(body, 'test');
+            assert.strictEqual(supportClassList ? body.className.split(',').join(' ') : body.className, defClazzName + clazz + ' test', 'Dom:addClass');
             assert.ok(dom.hasClass(body, clazz), 'Dom:hasClass');
             dom.removeClass(body, clazz);
-            assert.strictEqual(supportClassList ? body.className.split(',').join(' ') : body.className, defClazzName.trim(), 'Dom:removeClass');
+            assert.strictEqual(supportClassList ? body.className.split(',').join(' ') : body.className, (defClazzName.trim() + ' test').trim(), 'Dom:removeClass');
             assert.notOk(dom.hasClass(body, clazz), 'Dom:hasClass');
-            
+            dom.removeClass(body, 'test');
+
             dom.toggleClass(body, clazz);
             assert.strictEqual(supportClassList ? body.className.split(',').join(' ') : body.className, defClazzName + clazz, 'Dom:toggleClass');
             assert.ok(dom.hasClass(body, clazz), 'Dom:hasClass');
@@ -24,4 +26,4 @@
             assert.notOk(dom.hasClass(body, clazz), 'Dom:hasClass');
         }
     });
-})()
+})();

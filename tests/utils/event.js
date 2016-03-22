@@ -1,4 +1,4 @@
-(function () {
+/*(function () {
     QUnit.test("Ark:Utils:Event:crud", function (assert) {
         var event = Utils.Event.create('tester');
 
@@ -68,7 +68,7 @@
             assert.equal(cached.cancelBubble, false);
         } else {
             assert.equal(cached.cancelBubble, undefined);
-        }*/
+        }
         assert.equal(eventCount, 1);
         Utils.Event.remove(window, 'tester', hanlderCount, false);
 
@@ -87,7 +87,7 @@
             assert.equal(cached.cancelBubble, false);
         } else {
             assert.equal(cached.cancelBubble, undefined);
-        }*/
+        }*
         assert.equal(eventCount, 2);
         Utils.Event.remove(window, 'tester', hanlderCount, false);
         Utils.Event.remove(window, 'tester', handlerPrevent, false);
@@ -101,7 +101,7 @@
             assert.equal(cached.cancelBubble, true);
         } else {
             assert.equal(cached.cancelBubble, false);
-        }*/
+        }*
         assert.equal(eventCount, 3);
         Utils.Event.remove(window, 'tester', hanlderCount, false);
         Utils.Event.remove(window, 'tester', handlerStop, false);
@@ -117,7 +117,7 @@
             assert.equal(cached.cancelBubble, true);
         } else {
             assert.equal(cached.cancelBubble, false);
-        }*/
+        }*
         assert.equal(eventCount, 3);
         Utils.Event.remove(window, 'tester', hanlderCount, false);
         Utils.Event.remove(window, 'tester', handlerImmeStop, false);
@@ -132,9 +132,9 @@
             assert.equal(cached.cancelBubble, true);
         } else {
             assert.equal(cached.cancelBubble, false);
-        }*/
+        }*
         assert.equal(eventCount, 3);
         Utils.Event.remove(window, 'tester', handlerCancel, false);
         Utils.Event.remove(window, 'tester', handlerImmeStop, false);
     });
-})();
+})();*/

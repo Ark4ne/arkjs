@@ -1,34 +1,42 @@
-(function () {
-    function factory(Selector, document, Dom) {
+(function (document) {
+    /**
+     *
+     * @param {Selector} Selector
+     * @param {Dom} Dom
+     * @param {Event$Polyfill} Eventer
+     *
+     * @returns {ModalContent}
+     */
+    function factory(Selector, Dom, Eventer) {
         var body = document.documentElement,
-            isNode = Utils.isNode,
-            isElement = Utils.isElement,
-            css = Dom.css,
+            isArray = Utils.isArray,
             show = Dom.show,
             hide = Dom.hide,
             addClass = Dom.addClass,
             removeClass = Dom.removeClass,
             remove = Dom.remove,
-            append = Dom.append,
-            getAttr = Dom.getAttr,
-            setAttr = Dom.setAttr;
-
-        /**
-         * @param fn
-         * @param context
-         * @returns {Promise}
-         */
-        function promiseAnimationFrame(fn, context){
-            var promise = new Promise(function(resolve){
-                requestAnimationFrame(function(){
-                    fn.call(context);
-                    setTimeout(resolve, 0);
-                });
-            });
-            return promise;
-        }
+            append = Dom.append;
+        //isNode = Utils.isNode,
+        //isElement = Utils.isElement,
+        //css = Dom.css,
+        // getAttr = Dom.getAttr,
+        // setAttr = Dom.setAttr;
 
         var ModalManager = (function () {
+            /**
+             * @param fn
+             * @param context
+             * @returns {Promise}
+             */
+            function promiseAnimationFrame(fn, context) {
+                return new Promise(function (resolve) {
+                    requestAnimationFrame(function () {
+                        fn.call(context);
+                        setTimeout(resolve, 0);
+                    });
+                });
+            }
+
             /**
              * @constructor
              */
@@ -39,9 +47,11 @@
 
                 this.$con = null;
 
-                Utils.Event.attach(this.$$back, 'click', Utils.bind(this.close, this));
+                Eventer.attach(this.$$back, 'click', Utils.bind(this.close, this));
 
                 this.isOpen = false;
+                /** @type {Eventie} */
+                this.eventie = Ark('Eventie');
             }
 
             Utils.prototize(__ModalManager__, /** @lends {__ModalManager__.prototype} */{
@@ -52,7 +62,7 @@
                     this.$$content.innerHTML = '';
                 },
                 setContent: function (content) {
-                    if(content !== this.$con)
+                    if (content !== this.$con)
                         this.unsetContent();
                     if (content instanceof Modal)
                         this.$$content.appendChild(content.getElement());
@@ -60,22 +70,29 @@
                         this.$$content.appendChild(content);
                     this.$con = content;
                 },
+                /**
+                 * @param content
+                 * @returns {Promise}
+                 */
                 open: function (content) {
                     var self = this, promise;
-                    promise =  promiseAnimationFrame(function(){
-                        addClass(body, 'modal-open');
-                        show(this.$$elem);
-                    }, this);
 
-                    promise.then(function(){
+                    promise = promiseAnimationFrame(this.opening, this);
 
+                    promise.then(function () {
+                        self.eventie.emit('modal.open', content);
                         if (content) self.setContent(content);
                         self.isOpen = true;
                     });
 
                     return promise;
                 },
+                opening: function () {
+                    addClass(body, 'modal-open');
+                    show(this.$$elem);
+                },
                 close: function () {
+                    this.eventie.emit('modal.close', this.$con);
                     this.unsetContent();
                     removeClass(body, 'modal-open');
                     hide(this.$$elem);
@@ -94,26 +111,58 @@
             this.isOpen = false;
             this.$elem = null;
             this.autoDispose = true;
+            /** @type {Eventie} */
+            this.eventie = Ark('Eventie');
+
+            this.opened = Utils.bindCall(this.opened, this);
         }
 
         Utils.prototize(Modal, /** @lends {Modal.prototype} */{
+            /**
+             * @returns {Promise}
+             */
             open: function () {
-                var promise = ModalManager.open(this), self = this;
-                promise.then(function(){
-                    self.isOpen = true;
-                });
+                var promise = ModalManager.open(this);
+                promise.then(this.opened);
                 return promise;
             },
+            opened: function () {
+                this.isOpen = true;
+                this.eventie.emit("open");
+            },
+            /**
+             * @returns {Modal}
+             */
             close: function () {
                 ModalManager.close();
                 this.isOpen = false;
                 return this;
             },
-            closing : function(){
-                if(this.autoDispose){
+            closing: function () {
+                this.eventie.emit("close");
+                if (this.autoDispose) {
                     this.dispose();
                 }
             },
+            /**
+             * @param {Function} callback
+             * @returns {Modal}
+             */
+            onOpen: function (callback) {
+                this.eventie.on("open", callback);
+                return this;
+            },
+            /**
+             * @param {Function} callback
+             * @returns {Modal}
+             */
+            onClose: function (callback) {
+                this.eventie.on("close", callback);
+                return this;
+            },
+            /**
+             * @returns {Element|DocumentFragment}
+             */
             getElement: function () {
                 if (this.$elem)
                     return this.$elem;
@@ -123,14 +172,31 @@
             dispose: function () {
                 remove(this.$elem);
                 this.$elem = null;
+            },
+            destroy: function () {
+                this.dispose();
+                this.eventie.destroy();
+                this.eventie = null;
             }
         });
 
+        /**
+         * @static
+         * @type {ModalManager}
+         */
+        Modal.Manager = ModalManager;
+
+        /**
+         * @param {string} sClass
+         * @param {Node} child
+         * @returns {Node}
+         */
         var createDiv = function (sClass, child) {
             var div = Dom.createElem('DIV', sClass);
             div.appendChild(child);
             return div;
         };
+
         /**
          * @constructor
          * @extends {Modal}
@@ -140,7 +206,7 @@
          * @param btnFooter
          */
         function ModalContent(body, header, btnFooter) {
-            ModalContent.__super__.constructor.apply(this, arguments);
+            ModalContent.__super__.constructor.call(this);
             this.$h = null;
             this.$b = null;
             this.$f = null;
@@ -154,7 +220,7 @@
             setBody: function (elem, immediateApply) {
                 if (elem) {
                     this.$b = createDiv('modal-body', elem);
-                    if(immediateApply===true){
+                    if (immediateApply === true) {
                         ModalManager.setContent(this);
                     }
                 } else
@@ -169,30 +235,33 @@
                 return this;
             },
             setFooter: function (buttons) {
-                if(!Utils.isDefine(buttons)){
+                if (!Utils.isDefine(buttons)) {
                     buttons = []
                 }
-                else if(!isArray(buttons)){
+                else if (!isArray(buttons)) {
                     buttons = [buttons]
                 }
 
                 buttons.push({
-                    inner :'Close',
-                    action:Utils.bindCall(this.close, this)
+                    inner: 'Close',
+                    action: Utils.bindCall(this.close, this)
                 });
 
                 var i = 0, len = buttons.length, button, btn;
                 var docFrag = document.createDocumentFragment();
 
                 while (i < len) {
+                    /**
+                     * @type {{action : Function, inner : string, btnClass : string}}
+                     */
                     button = buttons[i];
-                    if(Dom.isElement(button)){
+                    if (Dom.isElement(button)) {
                         btn = button;
                     } else {
                         btn = Dom.createElem('BUTTON', "btn btn-" + (button.btnClass ? button.btnClass : 'default'));
                         btn.innerHTML = button.inner;
-                        btn.type = "button";
-                        Utils.isFunction(button.action) && Utils.Event.attach(btn, 'click', button.action);
+                        Dom.setAttr(btn, 'type', 'button');
+                        Utils.isFunction(button.action) && Eventer.attach(btn, 'click', button.action);
                         append(docFrag, btn);
                     }
                     append(docFrag, btn);
@@ -221,8 +290,42 @@
             }
         });
 
+
+        Ark.define('ModalNautili',
+            /**
+             * @param {Nautilus} Nautilus
+             */
+            function (Nautilus) {
+                /**
+                 * @constructor
+                 * @extends {ModalContent}
+                 */
+                function ModalNautili(url, title, obj) {
+                    ModalNautili.__super__.constructor.call(this);
+                    this.modClosing = Utils.bindCall(this.modClosing, this);
+                    this.onOpen((function (_this) {
+                        return function () {
+                            Nautilus.pushHash(url, obj, document.documentElement.title + ' : ' + title);
+                            Nautilus.onChange(_this.modClosing);
+                        }
+                    }(this)));
+                    this.onClose((function (_this) {
+                        return function () {
+                            Nautilus.offChange(_this.modClosing);
+                            Nautilus.goFirst();
+                        }
+                    }(this)));
+                }
+
+                return Utils.inherit(ModalNautili, ModalContent, /** @lends {ModalNautili.prototype} */ {
+                    modClosing: function () {
+                        this.close();
+                    }
+                });
+            }, ['Nautilus']);
+
         return ModalContent;
     }
 
-    Ark.define('Modal', factory, ['Selector', 'document', 'Dom']);
-})();
+    Ark.define('Modal', factory, ['Selector', 'Dom', 'Eventer']);
+})(document);

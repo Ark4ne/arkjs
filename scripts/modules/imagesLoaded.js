@@ -1,10 +1,18 @@
 (function() {
-    function factory (Utils, Promise){
+    /**
+     *
+     * @param {Utils} Utils
+     * @param {Promise} Promise
+     * @param {Event$Polyfill} Eventer
+     *
+     * @returns {ImagesLoad}
+     */
+    function factory (Utils, Promise, Eventer){
         var prototize = Utils.prototize,
             bind = Utils.bind,
             bindCall = Utils.bindCall,
-            attachEvent = Utils.Event.attach,
-            removeEvent = Utils.Event.remove;
+            attachEvent = Eventer.attach,
+            removeEvent = Eventer.remove;
 
             /**
              * ImgLoad
@@ -18,17 +26,18 @@
                 this.onload = bindCall(this.onload, this);
                 this.onerror = bindCall(this.onerror, this);
                 this.promise = new Promise(bind(this.promised, this));
+                /** @type {Function} resolve */
+                this.resolve = null;
             }
             prototize(ImgLoad, /** @lends {ImgLoad.prototype} */{
                     /**
                      * @method promised
                      * 
-                     * @param resolve
-                     * @param reject
+                     * @param {Function} resolve
                      */
-                    promised : function(resolve, reject) {
+                    promised : function(resolve) {
                         if (this.img.complete) {
-                            resolve(this.img, 'load')
+                            resolve(this.img, 'load');
                             this.dispose()
                         } else {
                             this.resolve = resolve;
@@ -185,5 +194,5 @@
         return ImagesLoad;
     }
     
-    Ark.define('ImagesLoad', factory, ['Utils', 'Promise']);
+    Ark.define('ImagesLoad', factory, ['Utils', 'Promise', 'Eventer']);
 })();

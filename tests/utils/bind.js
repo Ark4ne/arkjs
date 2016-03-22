@@ -5,10 +5,10 @@
             oncall: [],
             except: [],
             ctx: null
-    }
+    };
     function addMockBinds(name, opts){
         if(!Mock.Binds.hasOwnProperty(name))
-            Mock.Binds[name] = []
+            Mock.Binds[name] = [];
 
         if(Utils.isArray(opts)){
             for(var _i = 0, _len = opts.length; _i < _len; _i++)
@@ -16,7 +16,7 @@
         } else 
             Mock.Binds[name].push(Utils.merge({}, defaultBind, opts))
     }
-    
+
     addMockBinds('bind',[{}, 
                          {oncall: [1, 2, 3, '4'],except: [1, 2, 3, '4']}]);
     addMockBinds('bindCall',[{}, 
@@ -33,10 +33,10 @@
                                   {ctx: {}, onbind: [[]], except: [[]]},
                                   {ctx: {}, onbind: [{}], except: [{}]},
                                   {ctx: {}, onbind: [1] , oncall: [[]], except: [1]}]);
-    addMockBinds('bindArgs',[{}, 
+    /*addMockBinds('bindArgs',[{},
                              {oncall: [1, 2, 3, '4'], except: [1, 2, 3, '4']}, 
                              {onbind: [1, 2, 3], oncall: ['4'],except: [1, 2, 3, '4']}, 
-                             {onbind: [1, 2, 3], oncall: [],except: [1, 2, 3]}]);
+                             {onbind: [1, 2, 3], oncall: [],except: [1, 2, 3]}]);*/
 
     function Mock$Utils$Binds$Tester(method, test, idx, assert) {
         var bindable = function () {
@@ -67,4 +67,5 @@
             }
         }
     });
+
 })();

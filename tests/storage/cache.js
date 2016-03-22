@@ -7,7 +7,7 @@
 
         for(var i = 0, len = DATAS.length;i<len;i++){
             var data = DATAS[i];
-            storage.setItem(data.key, data.obj);
+            storage.set(data.key, data.obj);
         }
     })();
 
@@ -19,8 +19,8 @@
 
             assert.ok(Utils.hasOwnProp(storage, obj.key), 'Storage:hasOwnProp:'+obj.key+':');
             assert.strictEqual(storage[obj.key], obj.obj, 'Storage:[obj.key]==='+obj.key+':');
-            assert.ok(storage.hasItem(obj.key), 'Storage:hasItem:'+obj.key+':');
-            assert.strictEqual(storage.getItem(obj.key), obj.obj, 'Storage:getItem:obj.key==='+obj.key+':');
+            assert.ok(storage.has(obj.key), 'Storage:hasItem:'+obj.key+':');
+            assert.strictEqual(storage.get(obj.key), obj.obj, 'Storage:getItem:obj.key==='+obj.key+':');
             
 
             for(var key in obj){
@@ -35,11 +35,11 @@
         var storage =  Ark.require('CacheStorage');
         for(var i = 0, len = DATAS.length;i<len;i++){
             var data = DATAS[i];
-            storage.removeItem(data.key);
-            assert.notOk(storage.hasItem(data.key), 'Storage:hasItem:'+data.key+':false');
+            storage.remove(data.key);
+            assert.notOk(storage.has(data.key), 'Storage:hasItem:'+data.key+':false');
             assert.ok(storage[data.key] === undefined, 'Storage:['+data.key+']:undefined');
-            assert.ok(storage.getItem(data.key) === undefined, 'Storage:getItem:'+data.key+':undefined');
+            assert.ok(storage.get(data.key) === undefined, 'Storage:getItem:'+data.key+':undefined');
             assert.notOk(storage.hasOwnProperty(data.key), 'Storage:hasOwnProperty:'+data.key+':false');
         }
     });
-})()
+})();

@@ -1,15 +1,15 @@
-(function () {
+(function (window) {
     /**
-     * @param {Window} window
      * @param {Utils} Utils
+     * @param {Event$Polyfill} Eventer
      * @param {Function} TickAnimationFrame
      * @param {Function} TickTimeout
      * @returns {*}
      */
-    function factory(window, Utils, TickAnimationFrame, TickTimeout) {
+    function factory(Utils, Eventer, TickAnimationFrame, TickTimeout) {
         var merge = Utils.merge,
             prototize = Utils.prototize,
-            attachEvent = Utils.Event.attach,
+            attachEvent = Eventer.attach,
             hasOwnProperty = Utils.hasOwnProp,
             Grid, Gridify;
         var Cell = (function () {
@@ -83,7 +83,7 @@
                 this.opts = options;
                 this.opts.gutterPx = this.opts.gutter + 'px';
                 this.container = container;
-                this.containerWidth = container.clientWidth;
+                this.containerWidth = container.clientWidth - 30;
 
                 this.renderCells = TickAnimationFrame(this.renderCells, this);
             }
@@ -109,7 +109,7 @@
                         return this.renderAll();
                     }
 
-                    var containerWidth = this.containerWidth || this.container.clientWidth;
+                    var containerWidth = this.containerWidth || this.container.clientWidth - 30;
                     var windowHeight = window.innerHeight - 50;
                     this.renderRow(this.lastRow, containerWidth, windowHeight);
 
@@ -136,7 +136,7 @@
                         return;
                     }
 
-                    var containerWidth = this.containerWidth || this.container.clientWidth;
+                    var containerWidth = this.containerWidth || this.container.clientWidth - 30;
                     var windowHeight = window.innerHeight - 50;
 
                     while (this.added < this.cells.length) {
@@ -158,13 +158,13 @@
                     rowRatio = 0;
                     last = _i = idxStart = start;
                     _len = this.cells.length;
-                    idxEnd = _len - 1;
+                    //idxEnd = _len - 1;
                     targetHeight = this.opts.targetHeight;
                     justifyToMaxHeight = targetHeight > maxHeight;
                     targetHeight = justifyToMaxHeight ? maxHeight : targetHeight;
                     gutter = this.opts.gutter;
                     gutterPx = this.opts.gutterPx;
-                    justify = true;
+                    justify = false;
                     cellInRow = 0;
 
                     while (_i < _len) {
@@ -192,8 +192,8 @@
                         _i++
                     }
 
-                    justify |= last === idxEnd;
                     deltaWidth = maxWidth - (rowWidth - gutter) - 1;
+                    justify |= maxWidth <= 640 || (maxWidth > 640 && deltaWidth < maxWidth/3);//last === idxEnd;
 
                     _i = idxStart;
                     this.added = _len = last + 1;
@@ -270,7 +270,7 @@
                     }
                 },
                 resize: function () {
-                    var currentContainerWidth = this.container.clientWidth, lastContainerWidth = this.grid.containerWidth;
+                    var currentContainerWidth = this.container.clientWidth - 30, lastContainerWidth = this.grid.containerWidth;
                     if (lastContainerWidth !== currentContainerWidth) {
                         lastContainerWidth = currentContainerWidth;
                         this.grid.containerWidth = lastContainerWidth;
@@ -285,5 +285,5 @@
         return Gridify;
     }
 
-    Ark.define('Gridify', factory, ['window', 'Utils', 'TickAnimationFrame', 'TickTimeout']);
-}).call(this);
+    Ark.define('Gridify', factory, ['Utils', 'Eventer', 'TickAnimationFrame', 'TickTimeout']);
+})(window);

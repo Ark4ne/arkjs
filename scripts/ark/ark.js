@@ -2,10 +2,10 @@
     var hasOwn = global.Utils.hasOwnProp;
     var isArray = global.Utils.isArray;
     var inherit = global.Utils.inherit;
-    
+
     /**
      * @constructor
-     * 
+     *
      * @param {String} name
      * @param {Function} factory
      * @param {Array<String>} [inject]
@@ -16,44 +16,44 @@
         this.instance = null;
         this.$$inject = isArray(inject) && inject.length > 0 ? inject : [];
     }
-    
+
     Utils.prototize(Ark$Module,  /** @lends {Ark$Module.prototype} */{
-            /**
-             * @return {Object|Function|Array|String}
-             */
-            getInstance : function(){
-                if(this.instance == null){
-                    // make simple injection faster
-                    switch(this.$$inject.length){
-                        case 0 :
-                            this.instance = this.factory.call(global);
-                            break;
-                        case 1 :
-                            this.instance = this.factory.call(global, Ark.require(this.$$inject[0]));
-                            break;
-                        default :
-                            var _i = 0,
+        /**
+         * @return {Object|Function|Array|String}
+         */
+        getInstance : function(){
+            if(this.instance == null){
+                // make simple injection faster
+                switch(this.$$inject.length){
+                    case 0 :
+                        this.instance = this.factory.call(global);
+                        break;
+                    case 1 :
+                        this.instance = this.factory.call(global, Ark.require(this.$$inject[0]));
+                        break;
+                    default :
+                        var _i = 0,
                             _len = this.$$inject.length,
                             injection = new Array(_len);
 
-                            while(_i < _len){
-                                injection[_i] = Ark.require(this.$$inject[_i]);
-                                _i++;
-                            }
+                        while(_i < _len){
+                            injection[_i] = Ark.require(this.$$inject[_i]);
+                            _i++;
+                        }
 
-                            this.instance = this.factory.apply(global, injection);
+                        this.instance = this.factory.apply(global, injection);
 
-                            injection = null;
-                    }
+                        injection = null;
                 }
-                return this.instance;
             }
+            return this.instance;
+        }
     });
 
     /**
      * @constructor
      * @extends {Ark$Module}
-     * 
+     *
      * @param {String} name
      * @param {Function} factory
      * @param {Array<String>} [inject]
@@ -63,6 +63,9 @@
     }
 
     inherit(Ark$Factory, Ark$Module, /** @lends {Ark$Factory.prototype} */{
+        /**
+         * @return {Object}
+         */
         getInstance : function(){
             return new (Ark$Factory.__super__.getInstance.call(this))();
         }
@@ -71,7 +74,7 @@
     /**
      * @constructor
      * @extends {Ark$Module}
-     * 
+     *
      * @param {String} name
      * @param {Function} factory
      * @param {Array<String>} [inject]
@@ -81,6 +84,9 @@
     }
 
     inherit(Ark$Provider, Ark$Module, /** @lends {Ark$Provider.prototype} */{
+        /**
+         * @inheritDoc
+         */
         getInstance : function(){
             if(this.instance === null)
                 this.instance = new (Ark$Provider.__super__.getInstance.call(this))();
@@ -89,13 +95,10 @@
     });
 
     /**
-     * @namespace Ark
-     */
-    /**
-     * @function Ark(arg):{Ark|Object|Function|Ark$Module}
-     * 
+     * @function Ark(...arg):{Ark|Object|Function|Ark$Module}
+     *
      * @param {...String} arg
-     * 
+     *
      * @returns {Object|Function|Ark$Module}
      */
     function Ark(arg){
@@ -109,17 +112,17 @@
                 return Ark.define.apply(Ark, arguments);
         }
     }
-    
+
     /**
      * @template T
-     * 
-     * @function {Ark$$Define$Module({T} typeModule, {String} moduleName, {Function} factory, {Array<String>?} inject):{T}}
-     * 
+     *
+     * @function {Ark$$Define$Module({T extends Function} typeModule, {String} moduleName, {Function} factory, {Array<String>?} inject):{T}}
+     *
      * @param {T} typeModule
      * @param {String} moduleName
      * @param {Function} factory
      * @param {Array<String>} [inject]
-     * 
+     *
      * @throws {Error}
      *
      * @returns {T}
@@ -128,9 +131,9 @@
         if(hasOwn(Ark.$$modules$$, moduleName)){
             throw new Error("Module '"+moduleName+"' already defined.")
         }
-        
+
         return Ark.$$modules$$[moduleName] = new (typeModule)(moduleName, factory, inject);
-    }
+    };
 
     /**
      * @type {Object.<String, Ark$Module>}
@@ -143,13 +146,13 @@
      * @function define
      * @memberOf Ark
      * @static
-     * 
+     *
      * @param {String} moduleName
      * @param {Function} factory
      * @param {Array<String>} [inject]
-     * 
+     *
      * @throws {Error}
-     * 
+     *
      * @returns {Ark$Module}
      */
     Ark.define = function (moduleName, factory, inject){
@@ -189,14 +192,14 @@
     Ark.factory = function (moduleName, factory, inject){
         return Ark$$Define$Module(Ark$Factory, moduleName, factory, inject);
     };
-    
+
     /**
      * @function require
      * @memberOf Ark
      * @static
-     * 
+     *
      * @param {String} moduleName
-     * 
+     *
      * @returns {Object|Function|Array|String}
      */
     Ark.require = function (moduleName){
@@ -208,17 +211,17 @@
         }
         throw new Error("Module '"+moduleName+"' not defined.")
     };
-    
+
     // @TODO Create Module for require external script.
     var requiredJS = {};
-    
+
     /**
      * @function requireJS
      * @memberOf Ark
      * @static
-     * 
+     *
      * @param {String} pathFile
-     * 
+     *
      * @returns {Promise|Boolean}
      */
     Ark.requireJS = function (pathFile){
