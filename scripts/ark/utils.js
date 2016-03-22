@@ -1,4 +1,5 @@
-(/**
+(
+/**
  * @param {Window} window - Any value
  * @param {HTMLDocument} document - Any value
  * @param {Object} Math - Any value
@@ -143,16 +144,22 @@
      *
      * @returns {Function}
      */
-    function callOnce(fn, context) {
-        return (function (called, value) {
-            return function () {
-                if (!called) {
-                    called = true;
-                    value = fn.apply(context ? context : this, arguments);
+    function callOnce(fn, context){
+        return (
+            /**
+             * @param {boolean} called
+             * @param {*} [value]
+             */
+            function callOnceClosure(called, value){
+                return function(){
+                    if(!called){
+                        called = true;
+                        value = fn.apply(context ? context : this, arguments);
+                    }
+                    return value;
                 }
-                return value;
             }
-        }(false));
+        )(false);
     }
 
     /**

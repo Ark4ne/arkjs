@@ -1,6 +1,6 @@
 (function(window, Utils){
     var bindCallValue = Utils.bindCallValue;
-
+    
     /**
      * @constructor
      * @param {Function} fn
@@ -25,7 +25,7 @@
             this.tick = null;
         }
     });
-
+    
     Ark.define('TickAnimationFrame', function factory() {
 
         var callTickAnimationFrame = function(context){
@@ -38,13 +38,13 @@
         /**
          * @param {Function} fn
          * @param {Object} [context]
-         *
+         * 
          * @return {Function}
          */
         function TickAnimationFrame(fn, context){
-            return Utils.bindCallValue(callTickAnimationFrame, new TickClosure(fn), context);
-        }
-
+             return Utils.bindCallValue(callTickAnimationFrame, new TickClosure(fn), context);
+         }
+        
         return TickAnimationFrame;
     });
 

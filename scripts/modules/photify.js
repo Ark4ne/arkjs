@@ -302,8 +302,8 @@
          * @constructor
          */
         function Photify() {
-
             this.$$container = Selector.$class('photify')[0];
+
 
             this.clickEvElem = bindCallEvent(this.clickEvElem, this);
             this.mouseWheel = bindCallEvent(this.mouseWheel, this);
@@ -321,9 +321,6 @@
             this.close = bindCall(this.close, this);
             this.render = TickAnimationFrame(this.render, this);
 
-            /**
-             * @type {{trans: {x: number, y: number}, ltrans: {x: number, y: number}, mtrans: {x: number, y: number}, scale: number, lscale: number, img: {h: number, w: number}}}
-             */
             this.opts = {
                 trans: {x: 0, y: 0},
                 ltrans: {x: 0, y: 0},
@@ -709,52 +706,6 @@
                 if (ev.isFinal) {
                     return this.eventFinal(ev);
                 }
-                /*
-                 var containerWidth, imgWidth, changePosX, preview, posX;
-                 posX = this.opts.trans.x;
-                 containerWidth = winSize().width;
-                 imgWidth = this.opts.img.w * this.opts.scale;
-                 if (imgWidth < containerWidth) {
-                 changePosX = Math.max(110, 0.196428571 * containerWidth - 31.42857143) < Math.abs(posX);
-                 }
-                 preview = changePosX || false;
-                 if (preview && posX > 1) {
-
-                 to = posX - imgWidth / 2 - self.$$imgPrev.size.width / 2 - 30;
-                 }
-
-                 containerWidth = windowSize().width;
-                 viewerWidth = self.$$img.size.width * Math.max(1,scale);
-                 if (viewerWidth < containerWidth) {
-                 changePosX = Math.max(110, 0.196428571 * containerWidth - 31.42857143) < Math.abs(pos_x);
-                 }
-                 preview = changePosX || mobile;
-                 if (preview && pos_x > 1) {
-                 to = pos_x - viewerWidth / 2 - self.$$imgPrev.size.width / 2 - 30;
-                 if (mobile) {
-                 self.$$imgPrev.move(to, 0);
-                 } else {
-                 self.$$imgPrev.$$anim(to, -containerWidth, 300);
-                 }
-                 self.$$imgNext.$$$reset(containerWidth);
-                 changeElement = changePosX ? -1 : null;
-                 }
-                 if (preview && pos_x < -1) {
-                 to = pos_x + viewerWidth / 2 + self.$$imgNext.size.width / 2 + 30;
-                 if (mobile) {
-                 self.$$imgNext.move(to, 0);
-                 } else {
-                 self.$$imgNext.$$anim(to, containerWidth, 300);
-                 }
-                 self.$$imgPrev.$$$reset(-containerWidth);
-                 changeElement = changePosX ? 1 : null;
-                 }
-                 if (!preview) {
-                 self.$$imgNext.$$$reset(containerWidth);
-                 self.$$imgPrev.$$$reset(-containerWidth);
-                 changeElement = null;
-                 }
-                 */
                 this.render();
             },
             /**
