@@ -1,4 +1,4 @@
-(function () {
+(function (Ark) {
     /**
      * @param window
      * @param document
@@ -67,4 +67,4 @@
     }
 
     Ark.define('Support', factory, ['window', 'document', 'navigator']);
-})();
+})(Ark);

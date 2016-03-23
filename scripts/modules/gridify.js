@@ -1,4 +1,4 @@
-(function (window) {
+(function (window, Ark) {
     /**
      * @param {Utils} Utils
      * @param {Event$Polyfill} Eventer
@@ -153,12 +153,11 @@
                  * @param maxHeight int
                  */
                 renderRow: function (start, maxWidth, maxHeight) {
-                    var rowWidth, rowRatio, targetHeight, deltaWidth, justifyToMaxHeight, idxEnd, idxStart, last, justify, gutter, addHeight, addWidth, cell, _i, _len, px = "px", gutterPx, cellInRow;
+                    var rowWidth, rowRatio, targetHeight, deltaWidth, justifyToMaxHeight, idxStart, last, justify, gutter, addHeight, addWidth, cell, _i, _len, px = "px", gutterPx, cellInRow;
                     rowWidth = 0;
                     rowRatio = 0;
                     last = _i = idxStart = start;
                     _len = this.cells.length;
-                    //idxEnd = _len - 1;
                     targetHeight = this.opts.targetHeight;
                     justifyToMaxHeight = targetHeight > maxHeight;
                     targetHeight = justifyToMaxHeight ? maxHeight : targetHeight;
@@ -286,4 +285,4 @@
     }
 
     Ark.define('Gridify', factory, ['Utils', 'Eventer', 'TickAnimationFrame', 'TickTimeout']);
-})(window);
+})(window, Ark);

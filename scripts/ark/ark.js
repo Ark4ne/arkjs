@@ -1,14 +1,16 @@
 (function ArkGlobalClosure(global){
-    var hasOwn = global.Utils.hasOwnProp;
-    var isArray = global.Utils.isArray;
-    var inherit = global.Utils.inherit;
+    var Utils = global.Utils;
+    var hasOwn = Utils.hasOwnProp;
+    var isArray = Utils.isArray;
+    var inherit = Utils.inherit;
+    var prototize = Utils.prototize;
 
     /**
      * @constructor
      *
-     * @param {String} name
+     * @param {string} name
      * @param {Function} factory
-     * @param {Array<String>} [inject]
+     * @param {Array<string>} [inject]
      */
     function Ark$Module(name, factory, inject){
         this.name = name;
@@ -17,9 +19,9 @@
         this.$$inject = isArray(inject) && inject.length > 0 ? inject : [];
     }
 
-    Utils.prototize(Ark$Module,  /** @lends {Ark$Module.prototype} */{
+    prototize(Ark$Module,  /** @lends {Ark$Module.prototype} */{
         /**
-         * @return {Object|Function|Array|String}
+         * @return {Object|Function|Array|string}
          */
         getInstance : function(){
             if(this.instance == null){
@@ -30,6 +32,20 @@
                         break;
                     case 1 :
                         this.instance = this.factory.call(global, Ark.require(this.$$inject[0]));
+                        break;
+                    case 2 :
+                        this.instance = this.factory.call(global, Ark.require(this.$$inject[0]), Ark.require(this.$$inject[1]));
+                        break;
+                    case 3 :
+                        this.instance = this.factory.call(global, Ark.require(this.$$inject[0]), Ark.require(this.$$inject[1]), Ark.require(this.$$inject[2]));
+                        break;
+                    case 4 :
+                        this.instance = this.factory.call(global,
+                            Ark.require(this.$$inject[0]),
+                            Ark.require(this.$$inject[1]),
+                            Ark.require(this.$$inject[2]),
+                            Ark.require(this.$$inject[3])
+                        );
                         break;
                     default :
                         var _i = 0,
@@ -54,9 +70,9 @@
      * @constructor
      * @extends {Ark$Module}
      *
-     * @param {String} name
+     * @param {string} name
      * @param {Function} factory
-     * @param {Array<String>} [inject]
+     * @param {Array<string>} [inject]
      */
     function Ark$Factory(name, factory, inject){
         Ark$Factory.__super__.constructor.call(this, name, factory, inject);
@@ -75,9 +91,9 @@
      * @constructor
      * @extends {Ark$Module}
      *
-     * @param {String} name
+     * @param {string} name
      * @param {Function} factory
-     * @param {Array<String>} [inject]
+     * @param {Array<string>} [inject]
      */
     function Ark$Provider(name, factory, inject){
         Ark$Provider.__super__.constructor.call(this, name, factory, inject);
@@ -97,7 +113,7 @@
     /**
      * @function Ark(...arg):{Ark|Object|Function|Ark$Module}
      *
-     * @param {...String} arg
+     * @param {...string} arg
      *
      * @returns {Object|Function|Ark$Module}
      */
@@ -116,12 +132,12 @@
     /**
      * @template T
      *
-     * @function {Ark$$Define$Module({T extends Function} typeModule, {String} moduleName, {Function} factory, {Array<String>?} inject):{T}}
+     * @function {Ark$$Define$Module({T extends Function} typeModule, {string} moduleName, {Function} factory, {Array<string>?} inject):{T}}
      *
      * @param {T} typeModule
-     * @param {String} moduleName
+     * @param {string} moduleName
      * @param {Function} factory
-     * @param {Array<String>} [inject]
+     * @param {Array<string>} [inject]
      *
      * @throws {Error}
      *
@@ -136,7 +152,7 @@
     };
 
     /**
-     * @type {Object.<String, Ark$Module>}
+     * @type {Object.<string, Ark$Module>}
      * @memberOf Ark
      * @static
      */
@@ -147,9 +163,9 @@
      * @memberOf Ark
      * @static
      *
-     * @param {String} moduleName
+     * @param {string} moduleName
      * @param {Function} factory
-     * @param {Array<String>} [inject]
+     * @param {Array<string>} [inject]
      *
      * @throws {Error}
      *
@@ -164,9 +180,9 @@
      * @memberOf Ark
      * @static
      *
-     * @param {String} moduleName
+     * @param {string} moduleName
      * @param {Function} factory
-     * @param {Array<String>} [inject]
+     * @param {Array<string>} [inject]
      *
      * @throws {Error}
      *
@@ -181,9 +197,9 @@
      * @memberOf Ark
      * @static
      *
-     * @param {String} moduleName
+     * @param {string} moduleName
      * @param {Function} factory
-     * @param {Array<String>} [inject]
+     * @param {Array<string>} [inject]
      *
      * @throws {Error}
      *
@@ -198,9 +214,9 @@
      * @memberOf Ark
      * @static
      *
-     * @param {String} moduleName
+     * @param {string} moduleName
      *
-     * @returns {Object|Function|Array|String}
+     * @returns {Object|Function|Array|string}
      */
     Ark.require = function (moduleName){
         if(hasOwn(Ark.$$modules$$, moduleName)){
@@ -220,7 +236,7 @@
      * @memberOf Ark
      * @static
      *
-     * @param {String} pathFile
+     * @param {string} pathFile
      *
      * @returns {Promise|Boolean}
      */

@@ -3,69 +3,98 @@
         var isDefine = Utils.isDefine;
         var hasOwn = Utils.hasOwnProp;
         var arrIndexOf = Array.prototype.indexOf;
-        var isArray = Utils.isArray;
         var isObject = Utils.isObject;
         var isFunction = Utils.isFunction;
         var isNumber = Utils.isNumber;
         var isString = Utils.isString;
-
-        /**
-         * @param {Array|string} str
-         * @param {string} [splitter]
-         *
-         * @return {Array}
-         */
-        function stringToArray(str, splitter) {
-            return (isArray(str) ? str : str.split(splitter ? splitter : ' '));
-        }
-
-        var getBody = Utils.callOnce(
-            /**
-             * @returns {Element}
-             */
-            function getBody() {
-                return document.body ? document.body : document.getElementsByTagName('body')[0];
-            }
-        );
+        var splitStr = Utils.splitStr;
 
         var getHtml = Utils.callOnce(
             /**
              * @returns {Element}
              */
             function getHtml() {
-                return document.documentElement ? document.documentElement : (document.getElementsByTagName('html') ? document.getElementsByTagName('html')[0] : null);
+                if(!document.documentElement){
+                    document.documentElement = document.getElementsByTagName('html')[0];
+                }
+                return document.documentElement;
             }
         );
 
-        var $body = getBody();
-        var $html = getHtml();
-
-        /**
-         * @param {string} tagName
-         * @param {string} [className]
-         * @param {SetString} [attributes]
-         * @param {Node|Array|string} [content]
-         *
-         * @returns {HTMLElement|Element|Node}
-         */
-        function createElement(tagName, className, attributes, content) {
-            var elem;
-            if (!hasOwn(cachedElement, tagName)) {
-                cachedElement[tagName] = document.createElement(tagName);
+        var getBody = Utils.callOnce(
+            /**
+             * @returns {Element}
+             */
+            function getBody() {
+                if(!document.body){
+                    document.body = document.getElementsByTagName('body')[0];
+                }
+                return document.body;
             }
-            elem = cachedElement[tagName].cloneNode(false);
+        );
 
-            if (className)
-                addClass(elem, className);
+        var getHead = Utils.callOnce(
+            /**
+             * @returns {Element}
+             */
+            function getHead() {
+                if(!document.head){
+                    document.head = document.getElementsByTagName('head')[0];
+                }
+                return document.head;
+            }
+        );
 
-            if (attributes)
-                attrs(elem, attributes);
+        var $html = getHtml();
+        var $body = getBody();
+        var $head = getHead();
 
-            if (content)
-                content(elem, content);
+        var _Node_ = window['Node'];
+        var _HTMLElement_ = window['HTMLElement'];
+        var supportNode = isObject(_Node_) || isFunction(_Node_);
+        var supportHTMLElement = isObject(_HTMLElement_) || isFunction(_HTMLElement_);
+        var supportPageOffset = isDefine(window.pageXOffset);
+        var supportScrollZ = isDefine(window.scrollY);
+        var supportDocumentElement = (document.compatMode != null) && document.compatMode === "CSS1Compat" && ($html != null) && isDefine($html.scrollTop != null);
 
-            return elem;
-        }
+
+        var createElement = (
+            /**
+             * @param {Set.<(HTMLElement|Element|Node)>} cachedElements
+             * @returns {createElement}
+             */
+            function (cachedElements) {
+                /**
+                 * @param {string} tagName
+                 * @param {string} [className]
+                 * @param {SetString} [attributes]
+                 * @param {Node|Array|string} [contents]
+                 *
+                 * @returns {HTMLElement|Element|Node}
+                 */
+                function createElement(tagName, className, attributes, contents) {
+                    var elem;
+                    tagName = tagName.toUpperCase();
+                    if (!cachedElements.hasOwnProperty(tagName)) {
+                        cachedElements[tagName] = document.createElement(tagName);
+                    }
+                    elem = cachedElements[tagName].cloneNode(false);
+
+                    if (className)
+                        addClass(elem, className);
+
+                    if (attributes)
+                        attrs(elem, attributes);
+
+                    if (contents)
+                        content(elem, contents);
+
+                    return elem;
+                }
+
+                return createElement;
+            }
+        )({});
 
         var __addClass__, __removeClass__, __hasClass__, __toggleClass__;
         var supportClassList = isDefine($body.classList);
@@ -161,148 +190,77 @@
             }
         }
 
-
-        var cachedElement = {};
-
         var prevElementSibling = (function () {
-            if (!!document.getElementsByTagName('body')[0].previousElementSibling)
-            /**
-             * @param {Element} currentElement
-             * @returns {Element}
-             */
-                return function prevElementSibling(currentElement) {
+            if (!!$body.previousElementSibling) {
+                /**
+                 * @param {Element} currentElement
+                 * @returns {Element}
+                 */
+                function prevElementSibling(currentElement) {
                     return currentElement.previousElementSibling;
-                };
-            else
-            /**
-             * @param {Element} currentElement
-             * @returns {Element}
-             */
-                return function prevSibling(currentElement) {
+                }
+
+                return prevElementSibling;
+            }
+            else {
+                /**
+                 * @param {Node} currentElement
+                 * @returns {Node}
+                 */
+                function prevSibling(currentElement) {
                     return currentElement.previousSibling;
-                };
+                }
+
+                return prevSibling;
+            }
         }());
 
         var nextElementSibling = (function () {
-            if (!!document.getElementsByTagName('head')[0].nextElementSibling)
-            /**
-             * @param {Element} currentElement
-             * @returns {Element}
-             */
-                return function nextElementSibling(currentElement) {
+            if (!!$head.nextElementSibling) {
+                /**
+                 * @param {Element} currentElement
+                 * @returns {Element}
+                 */
+                function nextElementSibling(currentElement) {
                     return currentElement.nextElementSibling;
-                };
-            else
-            /**
-             * @param {Element} currentElement
-             * @returns {Element}
-             */
-                return function nextSibling(currentElement) {
-                    return currentElement.nextSibling;
-                };
-        }());
-        var _Node_ = window['Node'];
-        var _HTMLElement_ = window['HTMLElement'];
-        var supportNode = isObject(_Node_) || isFunction(_Node_);
-        var supportHTMLElement = isObject(_HTMLElement_) || isFunction(_HTMLElement_);
-
-        var supportPageOffset = isDefine(window.pageXOffset);
-        var supportScrollZ = isDefine(window.scrollY);
-        var supportDocumentElement = (document.compatMode != null) && document.compatMode === "CSS1Compat" && ($html != null) && isDefine($html.scrollTop != null);
-
-        /*
-         * @TODO Move Win to new Modules
-         */
-        /**
-         * @namespace Win
-         */
-        var Win = {};
-        /**
-         * Fastest get window size.
-         *
-         * support >= IE6
-         */
-        var winSize = (function ($body) {
-            var height = window.innerHeight, width = window.innerWidth, windowResize;
-
-            if (window.innerWidth && window.innerHeight) {
-                windowResize = function () {
-                    height = window.innerHeight;
-                    width = window.innerWidth;
-                };
-            } else {
-                height = $body.clientHeight;
-                width = $body.clientWidth;
-                windowResize = function () {
-                    height = $body.clientHeight;
-                    width = $body.clientWidth;
-                };
-            }
-
-            Ark('Eventer').attach(window, 'resize', windowResize);
-            /**
-             * @return {Sizable}
-             */
-            return function winSize() {
-                return {
-                    height: height,
-                    width: width
                 }
+
+                return nextElementSibling;
             }
-        })($body);
+            else {
+                /**
+                 * @param {Node} currentElement
+                 * @returns {Node}
+                 */
+                function nextSibling(currentElement) {
+                    return currentElement.nextSibling;
+                }
+
+                return nextSibling;
+            }
+        }());
 
         /**
-         * @return {Sizable}
+         * @param {string} content
+         * @returns {Text}
          */
-        Win.getSize = function () {
-            return winSize();
-        };
-        Win.getScrollX = (function () {
-            if (supportPageOffset) {
-                return function () {
-                    return window.pageXOffset;
-                };
-            } else if (supportScrollZ) {
-                return function () {
-                    return window.scrollX;
-                };
-            } else if (supportDocumentElement) {
-                return function () {
-                    return $html.scrollLeft;
-                };
-            } else {
-                return function () {
-                    return $body.scrollLeft;
-                };
-            }
-        })();
+        function newTextNode(content){
+            return document.createTextNode('' + (content ? content : ''));
+        }
 
-        Win.getScrollY = (function () {
-            if (supportPageOffset) {
-                return function () {
-                    return window.pageYOffset;
-                };
-            } else if (supportScrollZ) {
-                return function () {
-                    return window.scrollY;
-                };
-            } else if (supportDocumentElement) {
-                return function () {
-                    return $html.scrollTop;
-                };
-            } else {
-                return function () {
-                    return $body.scrollTop;
-                };
-            }
-        })();
+        /**
+         * @param {string} html
+         * @returns {DocumentFragment}
+         */
+        function htmlToDocFrag(html){
+            var frag = document.createDocumentFragment(), wrapper = document.createElement('div');
+            wrapper.innerHTML = html;
+            while (wrapper.childNodes.length)
+                frag.appendChild(wrapper.childNodes[0]);
 
-        Win.getScroll = function () {
-            return {
-                x: Win.getScrollX(),
-                y: Win.getScrollY()
-            };
-        };
+            wrapper = null;
+            return frag;
+        }
 
         /**
          * @param {*} node
@@ -325,10 +283,11 @@
         }
 
         /**
-         * find if a node is in the given parent
-         * @method hasParent
+         * Find if a node is in the given parent
+         *
          * @param {Node} node
          * @param {Node} parent
+         *
          * @return {boolean} found
          */
         function hasParent(node, parent) {
@@ -412,25 +371,25 @@
 
         /**
          * @param {Node} element
-         * @param {Node|Array|string} content
+         * @param {Node|Array|string} contents
          */
-        function content(element, content) {
-            if (content) {
-                switch (true) {
-                    case isNode(content) :
-                        element.appendChild(content);
-                        break;
-                    case Utils.isArray(content) :
-                        var i = 0, len = content.length;
-                        while (i < len) {
-                            content(element, content[i]);
-                            i++;
-                        }
-                        break;
-                    case Utils.isString(content) :
-                    default :
-                        element.appendChild(document.createTextNode('' + content));
-                }
+        function content(element, contents) {
+            if (!contents) return;
+
+            switch (true) {
+                case isNode(contents) :
+                    element.appendChild(contents);
+                    break;
+                case Utils.isArray(contents) :
+                    var i = 0, len = contents.length;
+                    while (i < len) {
+                        content(element, contents[i]);
+                        i++;
+                    }
+                    break;
+                case Utils.isString(contents) :
+                default :
+                    element.appendChild(newTextNode('' + contents));
             }
         }
 
@@ -439,7 +398,7 @@
          * @param {Array|string} clazz
          */
         function addClass(element, clazz) {
-            var aClazz = stringToArray(clazz), i = 0, len = aClazz.length;
+            var aClazz = splitStr(clazz), i = 0, len = aClazz.length;
             while (i < len) {
                 __addClass__.call(element, aClazz[i]);
                 i++;
@@ -451,7 +410,7 @@
          * @param {Array|string} clazz
          */
         function removeClass(element, clazz) {
-            var aClazz = stringToArray(clazz), i = 0, len = aClazz.length;
+            var aClazz = splitStr(clazz), i = 0, len = aClazz.length;
             while (i < len) {
                 __removeClass__.call(element, aClazz[i]);
                 i++;
@@ -465,7 +424,7 @@
          * @returns {boolean}
          */
         function hasClass(element, clazz) {
-            var aClazz = stringToArray(clazz), i = 0, len = aClazz.length, hasClass = true;
+            var aClazz = splitStr(clazz), i = 0, len = aClazz.length, hasClass = true;
             while (i < len && hasClass) {
                 hasClass = hasClass && __hasClass__.call(element, aClazz[i]);
                 i++;
@@ -478,7 +437,7 @@
          * @param {Array|string} clazz
          */
         function toggleClass(element, clazz) {
-            var aClazz = stringToArray(clazz), i = 0, len = aClazz.length;
+            var aClazz = splitStr(clazz), i = 0, len = aClazz.length;
             while (i < len) {
                 __toggleClass__.call(element, aClazz[i]);
                 i++;
@@ -559,14 +518,110 @@
             element.style.display = 'none';
         }
 
+        /*
+         * @TODO Move Win to new Modules
+         */
+        /**
+         * @namespace Win
+         */
+        var Win = {};
+        /**
+         * Fastest get window size.
+         *
+         * support >= IE6
+         */
+        var winSize = (function ($body, height, width) {
+            var windowResize;
+
+            if (window.innerWidth && window.innerHeight) {
+                windowResize = function () {
+                    height = window.innerHeight;
+                    width = window.innerWidth;
+                };
+            } else {
+                height = $body.clientHeight;
+                width = $body.clientWidth;
+                windowResize = function () {
+                    height = $body.clientHeight;
+                    width = $body.clientWidth;
+                };
+            }
+
+            Ark('Eventer').attach(window, 'resize', windowResize);
+
+            /**
+             * @return {Sizable}
+             */
+            return function winSize() {
+                return {
+                    height: height,
+                    width: width
+                }
+            }
+        })($body, window.innerHeight, window.innerWidth);
+
+        /**
+         * @return {Sizable}
+         */
+        Win.getSize = function () {
+            return winSize();
+        };
+        Win.getScrollX = (function () {
+            if (supportPageOffset) {
+                return function () {
+                    return window.pageXOffset;
+                };
+            } else if (supportScrollZ) {
+                return function () {
+                    return window.scrollX;
+                };
+            } else if (supportDocumentElement) {
+                return function () {
+                    return $html.scrollLeft;
+                };
+            } else {
+                return function () {
+                    return $body.scrollLeft;
+                };
+            }
+        })();
+
+        Win.getScrollY = (function () {
+            if (supportPageOffset) {
+                return function () {
+                    return window.pageYOffset;
+                };
+            } else if (supportScrollZ) {
+                return function () {
+                    return window.scrollY;
+                };
+            } else if (supportDocumentElement) {
+                return function () {
+                    return $html.scrollTop;
+                };
+            } else {
+                return function () {
+                    return $body.scrollTop;
+                };
+            }
+        })();
+
+        Win.getScroll = function () {
+            return {
+                x: Win.getScrollX(),
+                y: Win.getScrollY()
+            };
+        };
+
         /**
          * @namespace Dom
          *
-         * @borrows Win as {}
+         * @borrows Win as Win
          * @borrows getBody as Function
          * @borrows getHtml as Function
          * @borrows supportClassList as boolean
          * @borrows createElem as createElement
+         * @borrows htmlToDocFrag as htmlToDocFrag
          * @borrows isNode as isNode
          * @borrows isElement as isElement
          * @borrows hasParent as hasParent
@@ -595,6 +650,7 @@
             getHtml: getHtml,
             supportClassList: supportClassList,
             createElem: createElement,
+            htmlToDocFrag: htmlToDocFrag,
             isNode: isNode,
             isElement: isElement,
             hasParent: hasParent,

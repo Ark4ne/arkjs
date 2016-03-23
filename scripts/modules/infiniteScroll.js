@@ -1,4 +1,4 @@
-(function () {
+(function (Ark) {
 
     /**
      *
@@ -123,4 +123,4 @@
     }
 
     Ark.define('InfiniteScroll', factory, ['Utils', 'Dom', 'TickTimeout', 'Eventer']);
-})();
+})(Ark);

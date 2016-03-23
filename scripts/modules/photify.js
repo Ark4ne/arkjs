@@ -1,7 +1,5 @@
-(function (window, document, Math) {
+(function (window, document, Math, Ark, Utils) {
     /**
-     *
-     * @param {Utils} Utils
      * @param {Hammer} Hammer
      * @param {Nautilus} Nautilus
      * @param {Support} Support
@@ -11,7 +9,7 @@
      *
      * @returns {Photify}
      */
-    function factory(Utils, Hammer, Nautilus, Support, Selector, TickAnimationFrame, Eventer) {
+    function factory(Hammer, Nautilus, Support, Selector, TickAnimationFrame, Eventer) {
         /** @typedef {{srcEvent: Event, isFinal: boolean, deltaX: number, deltaY: number, scale: number}} HammerEvent */
         var prototize = Utils.prototize;
         var bindCall = Utils.bindCall;
@@ -62,8 +60,11 @@
             removeEvent(element, EVENT_NAME_MOUSE_SCROLL, mouseWheelHandler, false);
         }
 
+        /** @const {number} */
         var POS_CENTER = 0;
+        /** @const {number} */
         var POS_LEFT = 1;
+        /** @const {number} */
         var POS_RIGHT = 2;
 
         /**
@@ -264,6 +265,7 @@
                 return this;
             },
             /**
+             * TODO
              * @returns {Node|null}
              */
             next: function () {
@@ -278,6 +280,7 @@
                 return null;
             },
             /**
+             * TODO
              * @returns {Node|null}
              */
             prev: function () {
@@ -304,7 +307,6 @@
         function Photify() {
             this.$$container = Selector.$class('photify')[0];
 
-
             this.clickEvElem = bindCallEvent(this.clickEvElem, this);
             this.mouseWheel = bindCallEvent(this.mouseWheel, this);
 
@@ -320,7 +322,9 @@
 
             this.close = bindCall(this.close, this);
             this.render = TickAnimationFrame(this.render, this);
-
+            /**
+             * @type {{trans: {x: number, y: number}, ltrans: {x: number, y: number}, mtrans: {x: number, y: number}, scale: number, lscale: number, img: {h: number, w: number}}}
+             */
             this.opts = {
                 trans: {x: 0, y: 0},
                 ltrans: {x: 0, y: 0},
@@ -367,7 +371,7 @@
                         this.elemNext = new ImgManaged(next);
                         this.elemNext.fit(wSize, undefined, undefined, POS_RIGHT).transform(0,0,1).__render()
                     }
-                    this.elem.fit(wSize, undefined, undefined, POS_CENTER).transform(0,0,1).__render()
+                    this.elem.fit(wSize, undefined, undefined, POS_CENTER).transform(0,0,1).__render();
                     this.elemPrev.fit(wSize, undefined, undefined, POS_LEFT).transform(0,0,1).__render()
                 }
             },
@@ -706,6 +710,48 @@
                 if (ev.isFinal) {
                     return this.eventFinal(ev);
                 }
+
+                /*
+                var containerWidth, imgWidth, changePosX, preview, posX, to;
+                posX = this.opts.trans.x;
+                containerWidth = winSize().width;
+                imgWidth = this.opts.img.w * this.opts.scale;
+                if (imgWidth < containerWidth) {
+                    changePosX = Math.max(110, 0.196428571 * containerWidth - 31.42857143) < Math.abs(posX);
+                }
+                preview = changePosX || false;
+                if (preview && posX > 1 && this.elemPrev) {
+                    to = posX - imgWidth / 2 - this.elemPrev.opts.width / 2 - 30;
+
+
+                    this.elemPrev(containerWidth);
+                }
+                 if (preview && pos_x > 1) {
+                 to = pos_x - viewerWidth / 2 - self.$$imgPrev.size.width / 2 - 30;
+                 if (mobile) {
+                 self.$$imgPrev.move(to, 0);
+                 } else {
+                 self.$$imgPrev.$$anim(to, -containerWidth, 300);
+                 }
+                 self.$$imgNext.$$$reset(containerWidth);
+                 changeElement = changePosX ? -1 : null;
+                 }
+                 if (preview && pos_x < -1) {
+                 to = pos_x + viewerWidth / 2 + self.$$imgNext.size.width / 2 + 30;
+                 if (mobile) {
+                 self.$$imgNext.move(to, 0);
+                 } else {
+                 self.$$imgNext.$$anim(to, containerWidth, 300);
+                 }
+                 self.$$imgPrev.$$$reset(-containerWidth);
+                 changeElement = changePosX ? 1 : null;
+                 }
+                 if (!preview) {
+                 self.$$imgNext.$$$reset(containerWidth);
+                 self.$$imgPrev.$$$reset(-containerWidth);
+                 changeElement = null;
+                 }
+                 */
                 this.render();
             },
             /**
@@ -818,5 +864,5 @@
         return Photify;
     }
 
-    Ark.provider('Photify', factory, ['Utils', 'Hammer', 'Nautilus', 'Support', 'Selector', 'TickAnimationFrame', 'Eventer']);
-})(window, document, Math);
+    Ark.provider('Photify', factory, ['Hammer', 'Nautilus', 'Support', 'Selector', 'TickAnimationFrame', 'Eventer']);
+})(window, document, Math, Ark, Utils);

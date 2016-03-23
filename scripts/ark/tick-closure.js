@@ -1,4 +1,4 @@
-(function(window, Utils){
+(function(window, Ark, Utils){
     var bindCallValue = Utils.bindCallValue;
     
     /**
@@ -27,7 +27,6 @@
     });
     
     Ark.define('TickAnimationFrame', function factory() {
-
         var callTickAnimationFrame = function(context){
             if(!this.tick){
                 this.tick = true;
@@ -87,4 +86,4 @@
 
         return TickTimeout;
     });
-})(window, Utils);
+})(window, Ark, Utils);

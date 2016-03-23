@@ -1,4 +1,4 @@
-(function(document, Utils) {
+(function(document, Ark, Utils) {
     /**
      * Polyfill Selector
      *
@@ -174,4 +174,4 @@
         return Selector;
     }
     Ark.define('Selector', Factory$$Selector);
-})(document, Utils);
+})(document, Ark, Utils);

@@ -1,14 +1,13 @@
-(function(){
+(function(Ark){
 
-    function factory(){
-        /** @typedef {Object.<*, Function[]>} CallableSet */
+    function factory() {
 
         /**
          * @constructor
          */
-        function Eventie(){
+        function Eventie() {
             /**
-             * @type  {CallableSet}
+             * @type  {SetFunction}
              */
             this.handlers = {}
         }
@@ -20,7 +19,7 @@
              *
              * @returns {Eventie}
              */
-            on : function(event, handler){
+            on: function (event, handler) {
                 this.handlers[event] = this.handlers[event] || [];
                 this.handlers[event].push(handler);
 
@@ -32,8 +31,8 @@
              *
              * @returns {Eventie}
              */
-            off : function(event, handler){
-                if(!handler){
+            off: function (event, handler) {
+                if (!handler) {
                     delete this.handlers[event];
                 } else {
                     var handlers = this.handlers[event], idx;
@@ -47,7 +46,7 @@
              * @param {*} event
              * @param {Function} handler
              */
-            has : function(event, handler){
+            has: function (event, handler) {
                 var handlers = this.handlers[event];
                 return handlers && handlers.indexOf(handler) > -1;
             },
@@ -57,11 +56,29 @@
              *
              * @returns {Eventie}
              */
-            emit : function(event, data){
+            emit: function (event, data) {
                 var handler = this.handlers[event], i = 0, len = handler ? handler.length : 0;
 
-                while(i < len){
+                while (i < len) {
                     handler[i++](data);
+                }
+
+                return this;
+            },
+            /**
+             * @param {*} event
+             * @param {Object} [data]
+             *
+             * @returns {Eventie}
+             */
+            tryEmit: function (event, data) {
+                var handler = this.handlers[event], i = 0, len = handler ? handler.length : 0;
+
+                while (i < len) {
+                    try {
+                        handler[i++](data);
+                    } catch (e) {
+                    }
                 }
 
                 return this;
@@ -69,7 +86,7 @@
             /**
              *
              */
-            destroy : function(){
+            destroy: function () {
                 this.handlers = null;
             }
         });
@@ -78,4 +95,4 @@
     }
 
     Ark.factory('Eventie', factory);
-})();
+})(Ark);

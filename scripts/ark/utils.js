@@ -15,19 +15,21 @@
      * @template T
      */
     /**
-     * @typedef {Set.<string, string>} SetString
+     * @typedef {Set.<string>} SetString
      */
     /**
-     * @typedef {Map.<string, Function>} MapFunction
+     * @typedef {Set.<Function>} SetFunction
      */
     /**
      * @typedef {Object} Sizable
-     * @param {number} height
-     * @param {number} width
+     *
+     * @property {number} height -
+     * @property {number} width -
      */
     /**
      * @typedef {Sizable} SizableResource
-     * @property {string} url
+     *
+     * @property {string} url -
      */
 
     /** @const {string} */
@@ -62,10 +64,9 @@
          *
          * @returns {boolean}
          */
-         function isNaN(num) {
+        function (num) {
             return num !== num;
         };
-
 
     /**
      * @param {Object} obj - An Object
@@ -182,7 +183,7 @@
 
     /**
      * @param {Function} clazz - A Class
-     * @param {MapFunction} methods - An list of methods
+     * @param {SetFunction} methods - An list of methods
      *
      * @returns {Function}
      */
@@ -219,7 +220,7 @@
     /**
      * @param {Function} clazz - A Class
      * @param {Function} parent - A Class
-     * @param {MapFunction} methods - An list of methods
+     * @param {SetFunction} methods - An list of methods
      *
      * @returns {Function}
      */
@@ -335,6 +336,16 @@
     }
 
     /**
+     * @param {Array|string} str
+     * @param {string} [splitter=' ']
+     *
+     * @returns {Array|Array.<string>}
+     */
+    function splitStr(str, splitter) {
+        return (isArray(str) ? str : str.split(splitter ? splitter : ' '));
+    }
+
+    /**
      * @namespace Utils
      *
      * @borrows bindApply as bind
@@ -360,6 +371,7 @@
      * @borrows eachSince as eachSince
      * @borrows each as each
      * @borrows hasOwnProp as hasOwn
+     * @borrows splitStr as splitStr
      */
     var Utils = {
         bind: bindApply,
@@ -384,7 +396,8 @@
         eachRange: eachRange,
         eachSince: eachSince,
         each: each,
-        hasOwnProp: hasOwn
+        hasOwnProp: hasOwn,
+        splitStr : splitStr
     };
     window.Utils = Utils;
 

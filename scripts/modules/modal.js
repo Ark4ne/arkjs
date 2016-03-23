@@ -1,4 +1,4 @@
-(function (document) {
+(function (document, Ark, Utils) {
     /**
      *
      * @param {Selector} Selector
@@ -328,4 +328,4 @@
     }
 
     Ark.define('Modal', factory, ['Selector', 'Dom', 'Eventer']);
-})(document);
+})(document, Ark, Utils);
