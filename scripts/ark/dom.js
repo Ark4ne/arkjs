@@ -2,12 +2,12 @@
     function factory() {
         var isDefine = Utils.isDefine;
         var hasOwn = Utils.hasOwnProp;
-        var arrIndexOf = Array.prototype.indexOf;
         var isObject = Utils.isObject;
         var isFunction = Utils.isFunction;
         var isNumber = Utils.isNumber;
         var isString = Utils.isString;
         var splitStr = Utils.splitStr;
+        var arrIndexOf = Array.prototype.indexOf;
 
         var getHtml = Utils.callOnce(
             /**
